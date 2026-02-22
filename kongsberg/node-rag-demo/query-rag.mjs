@@ -54,7 +54,8 @@ async function ragQuery(query) {
   ];
 
   const llm = new ChatOpenAI({
-    modelName: "gpt-4.1",
+    // modelName: "gpt-4.1",
+    modelName: "gpt-4o-mini",
     temperature: 0.2,
     openAIApiKey: OPENAI_API_KEY,
     configuration: {

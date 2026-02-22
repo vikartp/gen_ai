@@ -10,7 +10,14 @@ from langgraph.graph import END, StateGraph, MessagesState
 from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
+
+model = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0,
+    base_url= OPENAI_API_BASE
+)
+
 search = DuckDuckGoSearchRun()
 
 # Shared tools

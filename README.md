@@ -134,6 +134,13 @@ This demo uses Chroma's persistent storage (no Docker needed) and LangChain.
    ```bash
    pip install uv
    ```
+   Alternative options
+   # Uninstall pip version if present
+   pip uninstall uv -y
+
+   # Install properly
+   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+   -> follow terminal guide after this
 
 4. **Install Dependencies:**
    ```bash
@@ -219,6 +226,10 @@ Experimental agentic AI implementations.
 3. **Install Dependencies:**
    ```bash
    uv pip install -e .
+   ```
+   Or if uv installed properly and having pyproject.toml(preferred)
+   ```bash
+   uv sync
    ```
    Or if there's a requirements file:
    ```bash

@@ -6,7 +6,14 @@ from langchain_core.tools import tool
 from langchain.agents import create_agent
 
 load_dotenv()
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
+
+model = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0,
+    base_url= OPENAI_API_BASE
+)
 
 @tool
 def web_search(query: str) -> str:
