@@ -10,7 +10,8 @@ load_dotenv()
 OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
 
 model = ChatOpenAI(
-    model="gpt-4o-mini",
+    # model="gpt-4o-mini", #Open router
+    model="gpt-4o", # Model zoo
     temperature=0,
     base_url= OPENAI_API_BASE
 )
