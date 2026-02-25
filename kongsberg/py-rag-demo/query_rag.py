@@ -10,13 +10,15 @@ from langchain_core.output_parsers import StrOutputParser
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
+
 PERSIST_DIR = "./chroma-store"
 
 # 1. Re-load vector store
 embeddings = OpenAIEmbeddings(
     model="text-embedding-3-large",
     api_key=OPENAI_API_KEY,
-    base_url="https://openrouter.ai/api/v1",
+    base_url=OPENAI_API_BASE,
 )
 
 vectorstore = Chroma(
@@ -28,10 +30,11 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
 
 # 2. LLM
 llm = ChatOpenAI(
-    model="gpt-4o-mini",  # Use OpenRouter model format: provider/model (e.g., openai/gpt-4o-mini)
+    model="gpt-4o",
+    # model="gpt-4o-mini",  # Use OpenRouter(https://openrouter.ai/api/v1) model format: provider/model (e.g., openai/gpt-4o-mini)
     temperature=0.2,
     api_key=OPENAI_API_KEY,  # Use your OpenRouter API key here
-    base_url="https://openrouter.ai/api/v1",
+    base_url=OPENAI_API_BASE,
 )
 
 # 3. Build RAG chain using LCEL (LangChain Expression Language)

@@ -12,6 +12,7 @@ from langchain_core.documents import Document
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
 
 # 1. Your corpus (replace with file loaders in your training later)
 raw_docs = [
@@ -33,7 +34,7 @@ docs = text_splitter.split_documents(
 embeddings = OpenAIEmbeddings(
     model="text-embedding-3-large",
     api_key=OPENAI_API_KEY,
-    base_url="https://openrouter.ai/api/v1",
+    base_url=OPENAI_API_BASE,
 )
 
 # 4. Create / persist Chroma store
