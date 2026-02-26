@@ -12,22 +12,36 @@ OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
 model = ChatOpenAI(
     # model="gpt-4o-mini", #Open router
     model="gpt-4o", # Model zoo
-    temperature=0,
+    temperature=1,
     base_url= OPENAI_API_BASE
 )
 
 @tool
 def web_search(query: str) -> str:
     """Search the web for current information."""
-    # Mock; replace with Tavily/DuckDuckGo in prod
+    print(f">>> web_search tool was called with: {query}")  # Debug line
     return f"Search results for '{query}': Agentic AI uses tools autonomously. LangChain enables this."
+
 
 tools = [web_search]
 
 agent = create_agent(model=model, tools=tools,
-                     system_prompt="You are a helpful agent that uses tools to answer questions accurately.")
+        system_prompt="You are a helpful agent that uses tools to answer questions accurately.")
 
-inputs = {"messages": [("user", "What is agentic AI?")]}
+# agent = create_agent(
+#     model=model, tools=tools,
+#     system_prompt="You are a helpful agent. You MUST use the web_search tool to answer ANY question. Never answer from your own knowledge."
+# )
+
+
+inputs = {"messages": [("user", "What is the correct roadmap to learn PostgreSQL?")]} # No tools used
+
+# inputs = {"messages": [("user", "What are the latest news about agentic AI in 2026?")]} # Tools used
+
 for chunk in agent.stream(inputs, stream_mode="updates"):
     if "model" in chunk:
         print(chunk["model"]["messages"][-1].content)
+
+
+# Notes: If we ask question which can be answered without using tools, then agent will not use tools,
+# rather it will answer it using its own knowledge. Agent decides itself to use tools or not.
