@@ -64,51 +64,71 @@ autonomously and make decisions on their own...
 ## 2. Agent 2: Multi-Tool Agent (agent_2_multitool.py)
 
 ### Purpose
-Demonstrates an agent using multiple tools to solve complex, multi-step problems.
+Demonstrates an agent using multiple tools to solve complex, multi-step problems — including real-time web search, math, live weather, and stock market data.
 
 ### Key Components
 - **LLM**: GPT-4o-mini
 - **Tools**:
   - `DuckDuckGoSearchResults()` - Real web search
-  - `calculate_profit()` - Custom math function
-- **Pattern**: Multi-tool orchestration
+  - `calculate_profit(revenue, cost)` - Custom math function
+  - `get_weather(location)` - Real-time weather via [Open-Meteo](https://open-meteo.com/) (free, no API key)
+  - `get_stock_info(symbol)` - Live stock data via `yfinance` (free, no API key)
+- **Pattern**: Multi-tool orchestration with dynamic prompt composition
 
 ### Architecture Diagram
 
 ```mermaid
 graph TD
-    A[User: Search + Calculate] --> B[Agent Brain]
-    B --> C{Which Tool?}
-    C -->|Search needed| D[DuckDuckGo Search]
-    C -->|Math needed| E[Calculate Profit]
-    D --> F[Search Results]
-    E --> G[Calculation Result]
-    F --> B
-    G --> B
-    B --> H[Synthesized Answer]
+    A[User Questions List] --> B[Combined Prompt]
+    B --> C[Agent Brain]
+    C --> D{Which Tool?}
+    D -->|Search query| E[DuckDuckGo Search]
+    D -->|Math / profit| F[calculate_profit]
+    D -->|City / location| G[get_weather via Open-Meteo]
+    D -->|Stock / ticker| H[get_stock_info via yfinance]
+    E & F & G & H --> C
+    C --> I[Synthesized Answer]
 ```
 
 ### How It Works
 
-1. **User asks**: "Search latest LangChain version. If revenue $500k and cost $350k, what's profit?"
-2. **Agent identifies**: Two tasks - search AND calculate
-3. **Agent executes**:
-   - First: Searches for LangChain version
-   - Second: Calculates profit ($500k - $350k = $150k)
-4. **Agent synthesizes**: Combines both results in one response
+1. **Define questions** in the `questions` list — each is a separate query string
+2. **Auto-combined** into one prompt via `" ".join(questions)`
+3. **Agent identifies** all tasks and calls the right tools
+4. **Agent synthesizes** all results into one cohesive response
 
-### Tool Selection Logic
-The agent autonomously decides which tool to use based on:
-- Keywords in the query
-- Task requirements
-- Sequential dependencies
+### Dynamic Prompt Pattern
+```python
+questions = [
+    "What is the current stock price of Reliance Industries and TCS?",
+    "What's the weather in Mumbai?",
+    "Search the latest LangChain version.",
+    "If revenue is $500k and cost is $350k, what's the profit?",
+]
+combined_prompt = " ".join(questions)
+```
+
+### Weather Tool Notes
+- Uses **Open-Meteo** (replaced `wttr.in` due to timeouts)
+- Two-step: geocode location → fetch forecast
+- Old `wttr.in` response shape (for reference):
+  ```
+  data["current_condition"][0] → temp_C, temp_F, FeelsLikeC, humidity, windspeedKmph
+  data["nearest_area"][0]      → areaName[0]["value"], country[0]["value"]
+  ```
+
+### Stock Tool Notes
+- Uses `yfinance` — supports NSE (`.NS`), BSE (`.BO`), and US tickers
+- Returns: price, day change %, day range, 52-week range, market cap, P/E, volume
+- Symbol examples: `RELIANCE.NS`, `TCS.NS`, `INFY.BO`, `AAPL`
 
 ### Output Example
 ```
-The latest version of LangChain is 1.2.16, published 3 days ago.
-
-Regarding the profit calculation, with revenue of $500,000 and cost 
-of $350,000, the profit is $150,000.
+Reliance Industries (RELIANCE.NS): ₹2,450.30 (+1.2%) | 52W: ₹2,100 — ₹2,900
+TCS (TCS.NS): ₹3,820.10 (-0.4%) | Market Cap: 13.87T INR
+Weather in Mumbai, India: Partly cloudy. 32°C / 89.6°F. Humidity: 74%. Wind: 18 km/h.
+Latest LangChain version: 0.3.x (as of search date)
+Profit: $500,000 - $350,000 = $150,000
 ```
 
 ---
