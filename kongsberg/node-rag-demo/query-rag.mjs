@@ -54,8 +54,8 @@ async function ragQuery(query) {
   ];
 
   const llm = new ChatOpenAI({
-    // modelName: "gpt-4.1",
-    modelName: "gpt-4o-mini",
+    modelName: "gpt-4.1", // Kognitwin's custom model based on gpt-4.1, optimized for retrieval-augmented generation tasks
+    // modelName: "gpt-4o-mini", // Open router's gpt-4o-mini, a smaller and faster model suitable for RAG tasks
     temperature: 0.2,
     openAIApiKey: OPENAI_API_KEY,
     configuration: {
